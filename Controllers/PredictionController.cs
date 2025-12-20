@@ -7,6 +7,10 @@ namespace Porumb_Denisa_Lab4.Controllers
 {
     public class PredictionController : Controller
     {
+        [HttpGet]
+        public IActionResult Price() => View();
+
+        [HttpPost]
         public IActionResult Price(PriceML.ModelInput input)
         {
             // Load the model
@@ -23,8 +27,15 @@ namespace Porumb_Denisa_Lab4.Controllers
             return View(input);
         }
 
+        [HttpGet]
+        public IActionResult Time()
+        {
+            return View();
+        }
+        [HttpPost]
         public IActionResult Time(TimeML.ModelInput input)
         {
+            
             // Load the model
             MLContext mlContext = new MLContext();
             // Create predection engine related to the loaded train model

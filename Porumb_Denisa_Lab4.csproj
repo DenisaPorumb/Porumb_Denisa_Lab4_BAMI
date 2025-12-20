@@ -16,6 +16,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Update="TimePrediction.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="TimePredictionMode;.mlnet">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

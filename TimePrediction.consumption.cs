@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace Porumb_Denisa_Lab4
 {
     public partial class TimePrediction
@@ -25,6 +26,8 @@ namespace Porumb_Denisa_Lab4
 
             [LoadColumn(2)]
             [ColumnName(@"passenger_count")]
+            [Range(1, 6, ErrorMessage = "Numărul de pasageri trebuie să fie între 1 și 6.")]
+
             public float Passenger_count { get; set; }
 
             [LoadColumn(3)]
@@ -33,6 +36,8 @@ namespace Porumb_Denisa_Lab4
 
             [LoadColumn(4)]
             [ColumnName(@"trip_distance")]
+            [Range(0.1, 1000, ErrorMessage = "Distanța trebuie să fie pozitivă.")]
+
             public float Trip_distance { get; set; }
 
             [LoadColumn(5)]
