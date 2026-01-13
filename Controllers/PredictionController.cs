@@ -127,5 +127,75 @@ namespace Porumb_Denisa_Lab4.Controllers
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Dashboard(DateTime? fromDate, DateTime? toDate)
+        {
+            var query = _context.PredictionHistories.AsQueryable();
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedAt.Date >= fromDate.Value.Date);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedAt.Date <= toDate.Value.Date);
+            }
+
+
+            // 1. Numărul total de predicții
+            var totalPredictions = await query.CountAsync();
+
+            // 2. Preț mediu per tip de plată + număr de predicții per tip
+            var paymentTypeStats = await query
+                .GroupBy(p => p.PaymentType)
+                .Select(g => new PaymentTypeStat
+                {
+                    PaymentType = g.Key,
+                    AveragePrice = g.Average(x => x.PredictedPrice),
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            // 3. Distribuția prețurilor pe intervale (buckets)
+            // Definim intervalele: 0-10, 10-20, 20-30, 30-50, >50
+            var allPredictions = await query
+                .Select(p => p.PredictedPrice)
+                .ToListAsync();
+
+            var buckets = new List<PriceBucketStat>
+    {
+        new PriceBucketStat { Label = "0 - 10", Count = 0 },
+        new PriceBucketStat { Label = "10 - 20", Count = 0 },
+        new PriceBucketStat { Label = "20 - 30", Count = 0 },
+        new PriceBucketStat { Label = "30 - 50", Count = 0 },
+        new PriceBucketStat { Label = "> 50", Count = 0 }
+    };
+
+            foreach (var price in allPredictions)
+            {
+                if (price < 10)
+                    buckets[0].Count++;
+                else if (price < 20)
+                    buckets[1].Count++;
+                else if (price < 30)
+                    buckets[2].Count++;
+                else if (price < 50)
+                    buckets[3].Count++;
+                else
+                    buckets[4].Count++;
+            }
+
+            // 4. Construim ViewModel-ul
+            var vm = new DashboardViewModel
+            {
+                TotalPredictions = totalPredictions,
+                PaymentTypeStats = paymentTypeStats,
+                PriceBuckets = buckets
+            };
+
+            return View(vm);
+        }
+
     }
 }
