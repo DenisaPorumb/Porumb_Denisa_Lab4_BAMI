@@ -1,0 +1,59 @@
+﻿@model BatchPredictionViewModel
+
+@{
+    ViewData["Title"] = "Batch prediction (CSV)";
+}
+
+<h2>Batch prediction (CSV)</h2>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @Model.ErrorMessage
+    </div>
+}
+
+<form asp-action="Batch" method="post" enctype="multipart/form-data" class="mb-4">
+    <div class="mb-3">
+        <label class="form-label">Fișier CSV cu curse taxi</label>
+        <input type="file" name="File" class="form-control" />
+        <small class="form-text text-muted">
+            Fișier CSV care respectă structura de intrare a modelului (ModelInput), cu header.
+        </small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Upload &amp; Predict
+    </button>
+</form>
+
+@if (Model.Predictions != null && Model.Predictions.Any())
+{
+    <h3>Rezultatele predicțiilor</h3>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Pasageri</th>
+                <th>Distanță (mile)</th>
+                <th>Timp (minute)</th>
+                <th>Preț prezis ($)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Predictions)
+            {
+                double timeInMinutes = p.Trip_time_in_secs / 60.0;
+
+                <tr>
+                    <td>@p.Passenger_count</td>
+                    <td>@p.Trip_distance</td>
+                    <td>
+                        @timeInMinutes.ToString("0.00")
+                    </td>
+                    <td>@p.Score.ToString("0.00")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
